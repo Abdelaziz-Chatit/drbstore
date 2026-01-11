@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'DRB Store' %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="nav-brand">⚡ DRB Store</a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/products">Products</a>
+                <a href="/cart">
+                    🛒 Cart
+                    <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
+                        <span class="cart-badge"><%= cartCount %></span>
+                    <% } %>
+                </a>
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <a href="/profile">👤 Profile</a>
+                    <% if (user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_RESPONSABLE'))) { %>
+                        <a href="/admin">📊 Admin</a>
+                    <% } %>
+                    <a href="/auth/logout">Logout</a>
+                <% } else { %>
+                    <a href="/auth/login">Login</a>
+                    <a href="/auth/register">Register</a>
+                <% } %>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <%- body %>
+    </main>
+
+    <footer>
+        <p>&copy; <%= new Date().getFullYear() %> DRB Store - Premium Products | Built with Node.js & Express</p>
+    </footer>
+
+    <script src="/js/cart.js"></script>
+</body>
+</html>
+

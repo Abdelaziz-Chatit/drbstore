@@ -1,0 +1,57 @@
+
+<h1>Admin Dashboard</h1>
+
+<div class="stats">
+    <div class="stat">
+        <div class="stat-number"><%= stats.orders %></div>
+        <div class="stat-label">Total Orders</div>
+    </div>
+    <div class="stat">
+        <div class="stat-number">$<%= parseFloat(stats.revenue || 0).toFixed(2) %></div>
+        <div class="stat-label">Total Revenue</div>
+    </div>
+    <div class="stat">
+        <div class="stat-number"><%= stats.products %></div>
+        <div class="stat-label">Products</div>
+    </div>
+    <div class="stat">
+        <div class="stat-number"><%= stats.users %></div>
+        <div class="stat-label">Users</div>
+    </div>
+</div>
+
+<h2>Recent Orders</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (typeof recentOrders !== 'undefined' && recentOrders.length > 0) { %>
+            <% recentOrders.forEach(order => { %>
+            <tr>
+                <td>#<%= order.id %></td>
+                <td><%= order.customer_name %></td>
+                <td>$<%= parseFloat(order.total_amount).toFixed(2) %></td>
+                <td><%= order.status %></td>
+                <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+            </tr>
+            <% }); %>
+        <% } else { %>
+            <tr><td colspan="5">No orders yet</td></tr>
+        <% } %>
+    </tbody>
+</table>
+
+<div style="margin-top: 2rem;">
+    <a href="/admin/products" class="btn">Manage Products</a>
+    <a href="/admin/categories" class="btn">Manage Categories</a>
+    <a href="/admin/orders" class="btn">Manage Orders</a>
+    <a href="/admin/advertisements" class="btn">Manage Advertisements</a>
+</div>
+

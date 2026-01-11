@@ -1,0 +1,55 @@
+<h1>Manage Advertisements</h1>
+
+<div style="margin-bottom: 2rem;">
+    <h2>Add New Advertisement</h2>
+    <form method="POST" action="/admin/advertisements" enctype="multipart/form-data" style="max-width: 600px;">
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Link (optional)</label>
+            <input type="url" name="link" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Image</label>
+            <input type="file" name="image" accept="image/*" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Order</label>
+            <input type="number" name="order" class="form-control" value="0">
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="is_active" checked> Active
+            </label>
+        </div>
+        <button type="submit" class="btn btn-success">Create Advertisement</button>
+    </form>
+</div>
+
+<h2>All Advertisements</h2>
+<div class="product-grid">
+    <% if (typeof advertisements !== 'undefined' && advertisements.length > 0) { %>
+        <% advertisements.forEach(ad => { %>
+        <div class="product-card">
+            <img src="<%= ad.image ? '/uploads/' + ad.image : '/images/placeholder.jpg' %>" alt="<%= ad.title %>">
+            <div class="product-card-body">
+                <h3><%= ad.title %></h3>
+                <p><%= ad.description || '' %></p>
+                <p><strong>Order:</strong> <%= ad.order %></p>
+                <p><strong>Active:</strong> <%= ad.is_active ? 'Yes' : 'No' %></p>
+            </div>
+        </div>
+        <% }); %>
+    <% } else { %>
+        <p>No advertisements yet</p>
+    <% } %>
+</div>
+
+<a href="/admin" class="btn" style="margin-top: 2rem;">Back to Dashboard</a>
+

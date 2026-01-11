@@ -1,0 +1,63 @@
+
+<h1>Checkout</h1>
+
+<div class="payment-info">
+    <strong>Secure Payment with Stripe</strong>
+    <p>After submitting, you'll be redirected to Stripe's secure payment page.</p>
+</div>
+
+<div class="checkout-container">
+    <div>
+        <h2>Shipping Information</h2>
+        <form method="POST" action="/checkout">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="text" name="phone" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <textarea name="address" class="form-control" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-success">Continue to Payment →</button>
+        </form>
+    </div>
+    <div>
+        <h2>Order Summary</h2>
+        <div class="order-summary-card">
+            <% if (typeof cartItems !== 'undefined' && cartItems.length > 0) { %>
+                <% cartItems.forEach(item => { %>
+                <div class="order-summary-item">
+                    <div>
+                        <div class="order-item-name"><%= item.product.name %></div>
+                        <div class="order-item-details">Qty: <%= item.quantity %> × $<%= parseFloat(item.product.price).toFixed(2) %></div>
+                    </div>
+                    <div class="order-item-price">$<%= (parseFloat(item.product.price) * item.quantity).toFixed(2) %></div>
+                </div>
+                <% }); %>
+            <% } %>
+            <div class="order-summary-totals">
+                <div class="order-total-row">
+                    <span>Subtotal:</span>
+                    <span>$<%= typeof total !== 'undefined' ? total : '0.00' %></span>
+                </div>
+                <div class="order-total-row">
+                    <span>Shipping:</span>
+                    <span>FREE</span>
+                </div>
+                <div class="order-total-final">
+                    <span>Total:</span>
+                    <span>$<%= typeof total !== 'undefined' ? total : '0.00' %></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

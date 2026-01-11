@@ -1,0 +1,10 @@
+
+<div class="success-page">
+    <h1>Order Successful!</h1>
+    <p>Thank you for your purchase.</p>
+    <% if (typeof order !== 'undefined' && order) { %>
+        <p>Order ID: #<%= order.id %></p>
+    <% } %>
+    <a href="/" class="btn">Continue Shopping</a>
+</div>
+

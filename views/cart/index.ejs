@@ -1,0 +1,58 @@
+
+<h1>Shopping Cart</h1>
+
+<% if (typeof cartItems !== 'undefined' && cartItems.length > 0) { %>
+    <div class="cart-items-container">
+        <div>
+            <% cartItems.forEach(item => { %>
+            <div class="cart-item">
+                <img src="<%= item.product.image ? '/uploads/' + item.product.image : '/images/placeholder.jpg' %>" class="cart-item-image">
+                <div class="cart-item-info">
+                    <h3><a href="/products/<%= item.product.id %>"><%= item.product.name %></a></h3>
+                    <p>$<%= parseFloat(item.product.price).toFixed(2) %> each</p>
+                    <p><strong>Subtotal: $<%= (parseFloat(item.product.price) * item.quantity).toFixed(2) %></strong></p>
+                </div>
+                <div class="cart-item-actions">
+                    <form method="POST" action="/cart/update/<%= item.product.id %>">
+                        <label>Quantity:</label>
+                        <input type="number" name="quantity" value="<%= item.quantity %>" min="1" max="99" class="cart-quantity-input">
+                        <button type="submit" class="btn">Update</button>
+                    </form>
+                    <form method="POST" action="/cart/remove/<%= item.product.id %>">
+                        <button type="submit" class="cart-remove-btn">Remove</button>
+                    </form>
+                </div>
+            </div>
+            <% }); %>
+            <form method="POST" action="/cart/clear">
+                <button type="submit" class="cart-clear-btn">Clear Cart</button>
+            </form>
+        </div>
+        <div>
+            <div class="order-summary-card">
+                <h3>Order Summary</h3>
+                <div class="order-summary-totals">
+                    <div class="order-total-row">
+                        <span>Subtotal:</span>
+                        <span>$<%= typeof total !== 'undefined' ? total : '0.00' %></span>
+                    </div>
+                    <div class="order-total-row">
+                        <span>Shipping:</span>
+                        <span>FREE</span>
+                    </div>
+                    <div class="order-total-final">
+                        <span>Total:</span>
+                        <span>$<%= typeof total !== 'undefined' ? total : '0.00' %></span>
+                    </div>
+                </div>
+                <a href="/checkout" class="btn btn-success" style="width: 100%; margin-top: 1rem;">Proceed to Checkout</a>
+            </div>
+        </div>
+    </div>
+<% } else { %>
+    <div class="cart-empty">
+        <p>Your cart is empty</p>
+        <a href="/products" class="btn">Continue Shopping</a>
+    </div>
+<% } %>
+

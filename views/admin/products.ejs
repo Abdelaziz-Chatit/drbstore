@@ -1,0 +1,80 @@
+<h1>Manage Products</h1>
+
+<div style="margin-bottom: 2rem;">
+    <h2>Add New Product</h2>
+    <form method="POST" action="/admin/products" enctype="multipart/form-data" style="max-width: 600px;">
+        <div class="form-group">
+            <label>Name</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" class="form-control" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+            <label>Price</label>
+            <input type="number" step="0.01" name="price" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Stock</label>
+            <input type="number" name="stock" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Category</label>
+            <select name="category_id" class="form-control">
+                <option value="">None</option>
+                <% if (typeof categories !== 'undefined') { %>
+                    <% categories.forEach(cat => { %>
+                        <option value="<%= cat.id %>"><%= cat.name %></option>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Image</label>
+            <input type="file" name="image" accept="image/*" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-success">Create Product</button>
+    </form>
+</div>
+
+<h2>All Products</h2>
+<table style="width: 100%; border-collapse: collapse;">
+    <thead>
+        <tr style="background: #f8f9fa;">
+            <th style="padding: 1rem; text-align: left;">ID</th>
+            <th style="padding: 1rem; text-align: left;">Image</th>
+            <th style="padding: 1rem; text-align: left;">Name</th>
+            <th style="padding: 1rem; text-align: left;">Price</th>
+            <th style="padding: 1rem; text-align: left;">Stock</th>
+            <th style="padding: 1rem; text-align: left;">Category</th>
+            <th style="padding: 1rem; text-align: left;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (typeof products !== 'undefined' && products.length > 0) { %>
+            <% products.forEach(product => { %>
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+                <td style="padding: 1rem;"><%= product.id %></td>
+                <td style="padding: 1rem;">
+                    <img src="<%= product.image ? '/uploads/' + product.image : '/images/placeholder.jpg' %>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                </td>
+                <td style="padding: 1rem;"><%= product.name %></td>
+                <td style="padding: 1rem;">$<%= parseFloat(product.price).toFixed(2) %></td>
+                <td style="padding: 1rem;"><%= product.stock %></td>
+                <td style="padding: 1rem;"><%= product.category_name || 'None' %></td>
+                <td style="padding: 1rem;">
+                    <form method="POST" action="/admin/products/<%= product.id %>/delete" style="display: inline;">
+                        <button type="submit" class="btn" style="background: #ef4444; padding: 0.5rem 1rem; font-size: 0.875rem;">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            <% }); %>
+        <% } else { %>
+            <tr><td colspan="7" style="padding: 2rem; text-align: center;">No products yet</td></tr>
+        <% } %>
+    </tbody>
+</table>
+
+<a href="/admin" class="btn" style="margin-top: 2rem;">Back to Dashboard</a>
+

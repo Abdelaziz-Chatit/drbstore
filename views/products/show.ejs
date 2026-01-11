@@ -1,0 +1,28 @@
+
+<div class="product-detail-container">
+    <div class="product-image-wrapper">
+        <img src="<%= product.image ? '/uploads/' + product.image : '/images/placeholder.jpg' %>" alt="<%= product.name %>">
+    </div>
+    <div class="product-info">
+        <h1><%= product.name %></h1>
+        <% if (product.category_name) { %>
+            <p>Category: <a href="/products?category=<%= product.category_id %>"><%= product.category_name %></a></p>
+        <% } %>
+        <div class="product-price">$<%= parseFloat(product.price).toFixed(2) %></div>
+        <div class="product-description">
+            <h3>Description</h3>
+            <p><%= product.description %></p>
+        </div>
+        <div class="product-actions-container">
+            <form method="POST" action="/cart/add/<%= product.id %>">
+                <div class="quantity-selector">
+                    <label>Quantity:</label>
+                    <input type="number" name="quantity" value="1" min="1" max="99">
+                </div>
+                <button type="submit" class="btn btn-success">Add to Cart</button>
+            </form>
+            <a href="/products" class="back-link">← Back to products</a>
+        </div>
+    </div>
+</div>
+

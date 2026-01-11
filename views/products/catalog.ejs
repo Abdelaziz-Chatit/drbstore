@@ -1,0 +1,53 @@
+
+<h1>Products</h1>
+
+<% if (typeof search !== 'undefined' && search) { %>
+    <p>Search results for: <strong><%= search %></strong> | <a href="/products">Clear</a></p>
+<% } %>
+
+<% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+<div class="category-filter">
+    <a href="/products" class="<%= !selectedCategory ? 'active' : '' %>">All Products</a>
+    <% categories.forEach(category => { %>
+        <a href="/products?category=<%= category.id %>" class="<%= selectedCategory && selectedCategory.id == category.id ? 'active' : '' %>">
+            <%= category.name %>
+        </a>
+    <% }); %>
+</div>
+<% } %>
+
+<div class="price-filter">
+    <form method="GET" action="/products">
+        <label>Price:</label>
+        <input type="number" name="price_min" placeholder="Min" value="<%= price_min || '' %>">
+        <span>—</span>
+        <input type="number" name="price_max" placeholder="Max" value="<%= price_max || '' %>">
+        <button type="submit">Filter</button>
+        <a href="/products">Clear</a>
+    </form>
+</div>
+
+<div class="product-grid">
+    <% if (typeof products !== 'undefined' && products.length > 0) { %>
+        <% products.forEach(product => { %>
+        <div class="product-card">
+            <img src="<%= product.image ? '/uploads/' + product.image : '/images/placeholder.jpg' %>" alt="<%= product.name %>">
+            <div class="product-card-body">
+                <h3><%= product.name %></h3>
+                <p><%= product.description.substring(0, 80) %>...</p>
+                <div class="product-price">$<%= parseFloat(product.price).toFixed(2) %></div>
+                <div class="product-actions">
+                    <a href="/products/<%= product.id %>" class="btn">View</a>
+                    <form method="POST" action="/cart/add/<%= product.id %>" class="add-to-cart-form">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn btn-success">Add to Cart</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <% }); %>
+    <% } else { %>
+        <p>No products found</p>
+    <% } %>
+</div>
+
