@@ -40,41 +40,70 @@
 </div>
 
 <h2 style="margin: 2.5rem 0 1rem 0; font-size: 1.75rem;">All Advertisements</h2>
-<div class="product-grid">
-    <% if (typeof advertisements !== 'undefined' && advertisements.length > 0) { %>
-        <% advertisements.forEach(ad => { %>
-        <div class="product-card">
-            <img src="<%= ad.image ? '/uploads/' + ad.image : '/images/placeholder.jpg' %>" alt="<%= ad.title %>">
-            <div class="product-card-body">
-                <h3><%= ad.title %></h3>
-                <% if (ad.description) { %>
-                    <p><%= ad.description %></p>
-                <% } %>
-                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                    <p><strong>Order:</strong> <%= ad.order %></p>
-                    <p>
-                        <strong>Status:</strong> 
-                        <span class="status-badge status-<%= ad.is_active ? 'paid' : 'cancelled' %>">
-                            <%= ad.is_active ? 'Active' : 'Inactive' %>
-                        </span>
-                    </p>
-                    <div style="margin-top: 1rem; display: flex; gap: 10px;">
-                        <button class="btn btn-sm" style="background-color: #007bff; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; flex: 1;" onclick="editAdvertisement('<%= JSON.stringify(ad).replace(/'/g, '&#39;') %>')">Edit</button>
-                        <form method="POST" action="/admin/advertisements/<%= ad.id %>/delete" style="display: inline; flex: 1;" onsubmit="return confirm('Delete this advertisement?');">
-                            <button type="submit" class="btn btn-sm" style="background-color: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; width: 100%;">Delete</button>
-                        </form>
+
+<% if (typeof advertisements !== 'undefined' && advertisements.length > 0) { %>
+    <div style="position: relative; max-width: 900px; margin: 0 auto;">
+        <!-- Carousel Container -->
+        <div id="adCarousel" style="position: relative; overflow: hidden; border-radius: 8px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <% advertisements.forEach((ad, index) => { %>
+            <div class="ad-slide" data-index="<%= index %>" style="display: <%= index === 0 ? 'block' : 'none' %>; animation: fadeIn 0.5s;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem; align-items: center;">
+                    <div>
+                        <img src="<%= ad.image ? '/uploads/' + ad.image : '/images/placeholder.jpg' %>" alt="<%= ad.title %>" style="width: 100%; height: 400px; object-fit: cover; border-radius: 8px;">
+                    </div>
+                    <div>
+                        <h3 style="font-size: 2rem; margin: 0 0 1rem 0;"><%= ad.title %></h3>
+                        <% if (ad.description) { %>
+                            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;"><%= ad.description %></p>
+                        <% } %>
+                        <div style="background: #f5f5f5; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                            <p style="margin: 0.5rem 0;"><strong>Order:</strong> <%= ad.order %></p>
+                            <p style="margin: 0.5rem 0;">
+                                <strong>Status:</strong> 
+                                <span class="status-badge status-<%= ad.is_active ? 'paid' : 'cancelled' %>" style="display: inline-block;">
+                                    <%= ad.is_active ? 'Active' : 'Inactive' %>
+                                </span>
+                            </p>
+                            <% if (ad.link) { %>
+                                <p style="margin: 0.5rem 0;"><strong>Link:</strong> <a href="<%= ad.link %>" target="_blank" style="color: #007bff;"><%= ad.link %></a></p>
+                            <% } %>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-sm edit-ad-btn" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; flex: 1;" 
+                                data-id="<%= ad.id %>" 
+                                data-title="<%= ad.title %>" 
+                                data-description="<%= ad.description || '' %>" 
+                                data-link="<%= ad.link || '' %>" 
+                                data-order="<%= ad.order %>" 
+                                data-active="<%= ad.is_active %>">Edit</button>
+                            <form method="POST" action="/admin/advertisements/<%= ad.id %>/delete" style="display: inline; flex: 1;" onsubmit="return confirm('Delete this advertisement?');">
+                                <button type="submit" class="btn btn-sm" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%;">Delete</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
+            <% }); %>
         </div>
-        <% }); %>
-    <% } else { %>
-        <div class="empty-state">
-            <h3>No advertisements yet</h3>
-            <p>Create your first advertisement to display on the homepage</p>
+
+        <!-- Navigation Arrows -->
+        <button id="prevBtn" style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); background: #007bff; color: white; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 24px; cursor: pointer; display: <%= advertisements.length > 1 ? 'flex' : 'none' %>; align-items: center; justify-content: center; transition: background 0.3s;" onmouseover="this.style.background='#0056b3'" onmouseout="this.style.background='#007bff'">❮</button>
+        
+        <button id="nextBtn" style="position: absolute; right: -60px; top: 50%; transform: translateY(-50%); background: #007bff; color: white; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 24px; cursor: pointer; display: <%= advertisements.length > 1 ? 'flex' : 'none' %>; align-items: center; justify-content: center; transition: background 0.3s;" onmouseover="this.style.background='#0056b3'" onmouseout="this.style.background='#007bff'">❯</button>
+
+        <!-- Carousel Indicators -->
+        <div style="display: flex; gap: 8px; justify-content: center; padding: 1.5rem 0;">
+            <% advertisements.forEach((ad, index) => { %>
+                <button class="carousel-indicator" data-index="<%= index %>" style="width: 12px; height: 12px; border-radius: 50%; border: none; background: <%= index === 0 ? '#007bff' : '#ccc' %>; cursor: pointer; transition: background 0.3s;"></button>
+            <% }); %>
         </div>
-    <% } %>
-</div>
+    </div>
+<% } else { %>
+    <div class="empty-state">
+        <h3>No advertisements yet</h3>
+        <p>Create your first advertisement to display on the homepage</p>
+    </div>
+<% } %>
 
 <!-- Edit Advertisement Modal -->
 <div id="editAdModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
@@ -126,27 +155,41 @@
 </div>
 
 <script>
-    function editAdvertisement(adData) {
-        try {
-            const ad = JSON.parse(adData);
-            console.log('Editing advertisement:', ad);
-            document.getElementById('adId').value = ad.id;
-            document.getElementById('adTitle').value = ad.title;
-            document.getElementById('adDescription').value = ad.description || '';
-            document.getElementById('adLink').value = ad.link || '';
-            document.getElementById('adOrder').value = ad.order || 0;
-            document.getElementById('adIsActive').checked = ad.is_active ? true : false;
-            document.getElementById('editAdForm').action = '/admin/advertisements/' + ad.id;
-            const modal = document.getElementById('editAdModal');
-            if (modal) {
-                modal.style.display = 'flex';
-                console.log('Ad modal opened successfully');
-            } else {
-                console.error('Ad modal element not found');
-            }
-        } catch (error) {
-            console.error('Error in editAdvertisement:', error);
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.ad-slide');
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+        if (totalSlides === 0) return;
+        
+        // Wrap around
+        if (index >= totalSlides) currentSlide = 0;
+        if (index < 0) currentSlide = totalSlides - 1;
+        
+        // Hide all slides
+        slides.forEach(slide => slide.style.display = 'none');
+        
+        // Show current slide
+        if (slides[currentSlide]) {
+            slides[currentSlide].style.display = 'block';
         }
+        
+        // Update indicators
+        document.querySelectorAll('.carousel-indicator').forEach((indicator, idx) => {
+            indicator.style.background = idx === currentSlide ? '#007bff' : '#ccc';
+        });
+    }
+
+    function nextSlide() {
+        currentSlide++;
+        if (currentSlide >= totalSlides) currentSlide = 0;
+        showSlide(currentSlide);
+    }
+
+    function prevSlide() {
+        currentSlide--;
+        if (currentSlide < 0) currentSlide = totalSlides - 1;
+        showSlide(currentSlide);
     }
 
     function closeEditAdModal() {
@@ -156,8 +199,49 @@
         }
     }
 
-    // Close modal when clicking outside - wait for DOM ready
+    // Initialize carousel and add event listeners
     document.addEventListener('DOMContentLoaded', function() {
+        // Show first slide
+        showSlide(0);
+
+        // Arrow button listeners
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+        if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+
+        // Indicator button listeners
+        document.querySelectorAll('.carousel-indicator').forEach(indicator => {
+            indicator.addEventListener('click', function() {
+                currentSlide = parseInt(this.getAttribute('data-index'));
+                showSlide(currentSlide);
+            });
+        });
+
+        // Handle edit button clicks
+        document.querySelectorAll('.edit-ad-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const id = this.getAttribute('data-id');
+                const title = this.getAttribute('data-title');
+                const description = this.getAttribute('data-description');
+                const link = this.getAttribute('data-link');
+                const order = this.getAttribute('data-order');
+                const isActive = this.getAttribute('data-active');
+                
+                document.getElementById('adId').value = id;
+                document.getElementById('adTitle').value = title;
+                document.getElementById('adDescription').value = description || '';
+                document.getElementById('adLink').value = link || '';
+                document.getElementById('adOrder').value = order || 0;
+                document.getElementById('adIsActive').checked = isActive === '1' || isActive === 'true' ? true : false;
+                document.getElementById('editAdForm').action = '/admin/advertisements/' + id;
+                document.getElementById('editAdModal').style.display = 'flex';
+            });
+        });
+
+        // Close modal when clicking outside
         const modal = document.getElementById('editAdModal');
         if (modal) {
             modal.addEventListener('click', function(e) {
@@ -167,5 +251,18 @@
             });
         }
     });
+
+    // CSS for fade animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .ad-slide {
+            animation: fadeIn 0.5s;
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 
