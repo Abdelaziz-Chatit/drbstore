@@ -100,6 +100,93 @@ router.post('/register', [
   }
 });
 
+// User Profile
+router.get('/profile', async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.redirect('/auth/login');
+    }
+
+    const [users] = await db.execute(
+      'SELECT id, name, email, phone, roles, created_at FROM users WHERE id = ?',
+      [req.session.user.id]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).render('error', { message: 'User not found' });
+    }
+
+    const user = users[0];
+    const roles = typeof user.roles === 'string' ? JSON.parse(user.roles) : user.roles;
+
+    res.render('profile', {
+      title: 'My Profile - DRB Store',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        roles: roles,
+        created_at: user.created_at
+      }
+    });
+  } catch (error) {
+    console.error('Profile error:', error);
+    res.status(500).render('error', { message: 'Error loading profile' });
+  }
+});
+
+// Update User Profile
+router.post('/profile/update', async (req, res) => {
+  try {
+    if (!req.session.user) {
+      console.log('No session user found');
+      return res.status(401).json({ success: false, error: 'Not authenticated' });
+    }
+
+    const { name, email, phone } = req.body;
+    console.log('Update profile request:', { name, email, phone, userId: req.session.user.id });
+
+    // Validate input
+    if (!name || !email) {
+      console.log('Missing required fields');
+      return res.status(400).json({ success: false, error: 'Name and email are required' });
+    }
+
+    // Check if email is already used by another user
+    const [existing] = await db.execute(
+      'SELECT id FROM users WHERE email = ? AND id != ?',
+      [email, req.session.user.id]
+    );
+
+    if (existing.length > 0) {
+      console.log('Email already in use');
+      return res.status(400).json({ success: false, error: 'Email already in use by another account' });
+    }
+
+    // Update user in database
+    const result = await db.execute(
+      'UPDATE users SET name = ?, email = ?, phone = ? WHERE id = ?',
+      [name, email, phone || null, req.session.user.id]
+    );
+    console.log('Update result:', result);
+
+    // Update session
+    req.session.user.name = name;
+    req.session.user.email = email;
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).json({ success: false, error: 'Error saving session' });
+      }
+      res.json({ success: true, message: 'Profile updated successfully' });
+    });
+  } catch (error) {
+    console.error('Profile update error:', error);
+    res.status(500).json({ success: false, error: error.message || 'Error updating profile' });
+  }
+});
+
 // Logout
 router.get('/logout', (req, res) => {
   req.session.destroy();

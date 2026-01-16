@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= typeof title !== 'undefined' ? title : 'DRB Store' %></title>
+    <title><%= typeof title !== 'undefined' ? title : 'DRB Store' %> - Premium E-Commerce</title>
     <link rel="stylesheet" href="/css/style.css">
+    <meta name="description" content="DRB Store - Your premium destination for quality products">
 </head>
 <body>
     <header>
@@ -13,16 +14,16 @@
             <div class="nav-links">
                 <a href="/">Home</a>
                 <a href="/products">Products</a>
-                <a href="/cart">
+                <a href="/cart" style="position: relative;">
                     🛒 Cart
                     <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
                         <span class="cart-badge"><%= cartCount %></span>
                     <% } %>
                 </a>
                 <% if (typeof user !== 'undefined' && user) { %>
-                    <a href="/profile">👤 Profile</a>
+                    <a href="/auth/profile">👤 <%= user.name %></a>
                     <% if (user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_RESPONSABLE'))) { %>
-                        <a href="/admin">📊 Admin</a>
+                        <a href="<% if (user.roles.includes('ROLE_ADMIN')) { %>/admin<% } else { %>/admin/manager-dashboard<% } %>">📊 <%= user.roles.includes('ROLE_ADMIN') ? 'Admin' : 'Manager' %></a>
                     <% } %>
                     <a href="/auth/logout">Logout</a>
                 <% } else { %>
@@ -39,6 +40,7 @@
 
     <footer>
         <p>&copy; <%= new Date().getFullYear() %> DRB Store - Premium Products | Built with Node.js & Express</p>
+        <p style="margin-top: 1rem; opacity: 0.8; font-size: 0.9rem;">All rights reserved</p>
     </footer>
 
     <script src="/js/cart.js"></script>

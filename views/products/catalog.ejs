@@ -1,9 +1,11 @@
-
-<h1>Products</h1>
-
-<% if (typeof search !== 'undefined' && search) { %>
-    <p>Search results for: <strong><%= search %></strong> | <a href="/products">Clear</a></p>
-<% } %>
+<div class="page-header">
+    <h1>Products</h1>
+    <% if (typeof search !== 'undefined' && search) { %>
+        <p>Search results for: <strong><%= search %></strong> | <a href="/products" style="color: var(--primary); text-decoration: none; font-weight: 600;">Clear</a></p>
+    <% } else { %>
+        <p>Browse our collection of premium products</p>
+    <% } %>
+</div>
 
 <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
 <div class="category-filter">
@@ -18,11 +20,14 @@
 
 <div class="price-filter">
     <form method="GET" action="/products">
-        <label>Price:</label>
-        <input type="number" name="price_min" placeholder="Min" value="<%= price_min || '' %>">
+        <% if (typeof selectedCategory !== 'undefined' && selectedCategory) { %>
+            <input type="hidden" name="category" value="<%= selectedCategory.id %>">
+        <% } %>
+        <label>Filter by Price:</label>
+        <input type="number" name="price_min" placeholder="Min" value="<%= price_min || '' %>" class="form-control">
         <span>—</span>
-        <input type="number" name="price_max" placeholder="Max" value="<%= price_max || '' %>">
-        <button type="submit">Filter</button>
+        <input type="number" name="price_max" placeholder="Max" value="<%= price_max || '' %>" class="form-control">
+        <button type="submit" class="btn">Apply Filter</button>
         <a href="/products">Clear</a>
     </form>
 </div>
@@ -47,7 +52,11 @@
         </div>
         <% }); %>
     <% } else { %>
-        <p>No products found</p>
+        <div class="empty-state">
+            <h3>No products found</h3>
+            <p>Try adjusting your search or filter criteria</p>
+            <a href="/products" class="btn">View All Products</a>
+        </div>
     <% } %>
 </div>
 

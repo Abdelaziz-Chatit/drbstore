@@ -1,30 +1,33 @@
-<h1>Manage Orders</h1>
+<div class="page-header">
+    <h1>Manage Orders</h1>
+    <p>View and update order status</p>
+</div>
 
-<table style="width: 100%; border-collapse: collapse;">
+<table>
     <thead>
-        <tr style="background: #f8f9fa;">
-            <th style="padding: 1rem; text-align: left;">ID</th>
-            <th style="padding: 1rem; text-align: left;">Customer</th>
-            <th style="padding: 1rem; text-align: left;">Email</th>
-            <th style="padding: 1rem; text-align: left;">Total</th>
-            <th style="padding: 1rem; text-align: left;">Status</th>
-            <th style="padding: 1rem; text-align: left;">Date</th>
-            <th style="padding: 1rem; text-align: left;">Actions</th>
+        <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Email</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Update Status</th>
         </tr>
     </thead>
     <tbody>
         <% if (typeof orders !== 'undefined' && orders.length > 0) { %>
             <% orders.forEach(order => { %>
-            <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 1rem;">#<%= order.id %></td>
-                <td style="padding: 1rem;"><%= order.customer_name %></td>
-                <td style="padding: 1rem;"><%= order.customer_email %></td>
-                <td style="padding: 1rem;">$<%= parseFloat(order.total_amount).toFixed(2) %></td>
-                <td style="padding: 1rem;"><%= order.status %></td>
-                <td style="padding: 1rem;"><%= new Date(order.created_at).toLocaleDateString() %></td>
-                <td style="padding: 1rem;">
+            <tr>
+                <td><strong>#<%= order.id %></strong></td>
+                <td><%= order.customer_name %></td>
+                <td><%= order.customer_email %></td>
+                <td><strong>$<%= parseFloat(order.total_amount).toFixed(2) %></strong></td>
+                <td><span class="status-badge status-<%= order.status.toLowerCase() %>"><%= order.status %></span></td>
+                <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+                <td>
                     <form method="POST" action="/admin/orders/<%= order.id %>/status" style="display: inline;">
-                        <select name="status" onchange="this.form.submit()" style="padding: 0.5rem; border-radius: 4px;">
+                        <select name="status" onchange="this.form.submit()" class="form-control" style="width: auto; display: inline-block; min-width: 120px;">
                             <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
                             <option value="paid" <%= order.status === 'paid' ? 'selected' : '' %>>Paid</option>
                             <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Shipped</option>
@@ -36,10 +39,12 @@
             </tr>
             <% }); %>
         <% } else { %>
-            <tr><td colspan="7" style="padding: 2rem; text-align: center;">No orders yet</td></tr>
+            <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No orders yet</td></tr>
         <% } %>
     </tbody>
 </table>
 
-<a href="/admin" class="btn" style="margin-top: 2rem;">Back to Dashboard</a>
+<div style="margin-top: 2rem;">
+    <a href="<% if (user.roles.includes('ROLE_ADMIN')) { %>/admin<% } else { %>/admin/manager-dashboard<% } %>" class="btn btn-outline">← Back to Dashboard</a>
+</div>
 

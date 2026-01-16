@@ -1,5 +1,7 @@
-
-<h1>Shopping Cart</h1>
+<div class="page-header">
+    <h1>Shopping Cart</h1>
+    <p>Review your items and proceed to checkout</p>
+</div>
 
 <% if (typeof cartItems !== 'undefined' && cartItems.length > 0) { %>
     <div class="cart-items-container">
@@ -9,14 +11,14 @@
                 <img src="<%= item.product.image ? '/uploads/' + item.product.image : '/images/placeholder.jpg' %>" class="cart-item-image">
                 <div class="cart-item-info">
                     <h3><a href="/products/<%= item.product.id %>"><%= item.product.name %></a></h3>
-                    <p>$<%= parseFloat(item.product.price).toFixed(2) %> each</p>
-                    <p><strong>Subtotal: $<%= (parseFloat(item.product.price) * item.quantity).toFixed(2) %></strong></p>
+                    <p style="color: var(--text-secondary);">$<%= parseFloat(item.product.price).toFixed(2) %> each</p>
+                    <p style="margin-top: 0.5rem;"><strong>Subtotal: $<%= (parseFloat(item.product.price) * item.quantity).toFixed(2) %></strong></p>
                 </div>
                 <div class="cart-item-actions">
-                    <form method="POST" action="/cart/update/<%= item.product.id %>">
-                        <label>Quantity:</label>
+                    <form method="POST" action="/cart/update/<%= item.product.id %>" style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                        <label style="font-weight: 600;">Qty:</label>
                         <input type="number" name="quantity" value="<%= item.quantity %>" min="1" max="99" class="cart-quantity-input">
-                        <button type="submit" class="btn">Update</button>
+                        <button type="submit" class="btn btn-sm">Update</button>
                     </form>
                     <form method="POST" action="/cart/remove/<%= item.product.id %>">
                         <button type="submit" class="cart-remove-btn">Remove</button>
@@ -45,14 +47,15 @@
                         <span>$<%= typeof total !== 'undefined' ? total : '0.00' %></span>
                     </div>
                 </div>
-                <a href="/checkout" class="btn btn-success" style="width: 100%; margin-top: 1rem;">Proceed to Checkout</a>
+                <a href="/checkout" class="btn btn-success" style="width: 100%; margin-top: 1rem; display: block; text-align: center;">Proceed to Checkout</a>
             </div>
         </div>
     </div>
 <% } else { %>
     <div class="cart-empty">
+        <h3 style="font-size: 2rem; margin-bottom: 1rem;">🛒</h3>
         <p>Your cart is empty</p>
-        <a href="/products" class="btn">Continue Shopping</a>
+        <a href="/products" class="btn" style="margin-top: 1.5rem;">Continue Shopping</a>
     </div>
 <% } %>
 

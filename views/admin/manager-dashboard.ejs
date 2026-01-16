@@ -1,0 +1,27 @@
+<div class="page-header">
+    <h1>Manager Dashboard</h1>
+    <p>Manage products, categories, and advertisements</p>
+</div>
+
+<!-- Manager Statistics -->
+<div class="stats">
+    <div class="stat">
+        <div class="stat-number"><%= stats.products %></div>
+        <div class="stat-label">Products</div>
+    </div>
+    <div class="stat">
+        <div class="stat-number"><%= stats.categories %></div>
+        <div class="stat-label">Categories</div>
+    </div>
+    <div class="stat">
+        <div class="stat-number"><%= stats.advertisements %></div>
+        <div class="stat-label">Advertisements</div>
+    </div>
+</div>
+
+<!-- Manager Actions -->
+<div class="admin-actions">
+    <a href="/admin/products" class="btn">Manage Products</a>
+    <a href="/admin/categories" class="btn">Manage Categories</a>
+    <a href="/admin/advertisements" class="btn">Manage Advertisements</a>
+</div>

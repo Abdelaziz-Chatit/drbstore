@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .kpi-container {
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .kpi-header {
+      margin-bottom: 30px;
+    }
+    
+    .kpi-header h1 {
+      margin: 0 0 10px 0;
+    }
+    
+    .kpi-header p {
+      color: #666;
+      margin: 0;
+    }
+    
+    .kpi-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-left: 4px solid #007bff;
+    }
+    
+    .stat-card.revenue {
+      border-left-color: #28a745;
+    }
+    
+    .stat-card.orders {
+      border-left-color: #ffc107;
+    }
+    
+    .stat-card.products {
+      border-left-color: #17a2b8;
+    }
+    
+    .stat-label {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    
+    .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .stat-change {
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
+    }
+    
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    @media (max-width: 1024px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .chart-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .chart-container h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    
+    .table-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .table-container h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table th {
+      background-color: #f8f9fa;
+      padding: 12px;
+      text-align: left;
+      font-weight: bold;
+      border-bottom: 2px solid #ddd;
+    }
+    
+    .data-table td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .data-table tr:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .metric:last-child {
+      border-bottom: none;
+    }
+    
+    .metric-label {
+      font-weight: 500;
+    }
+    
+    .metric-value {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="kpi-container">
+    <div class="kpi-header">
+      <h1>📊 KPI & Analytics Dashboard</h1>
+      <p>Real-time business metrics and performance indicators</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="kpi-stats">
+      <div class="stat-card revenue">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value">$<%= (orderStats.revenue || 0).toFixed(2) %></div>
+        <div class="stat-change">From <%= orderStats.completed_orders || 0 %> completed orders</div>
+      </div>
+      
+      <div class="stat-card orders">
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value"><%= orderStats.total_orders || 0 %></div>
+        <div class="stat-change">
+          Completed: <%= orderStats.completed_orders || 0 %> | 
+          Pending: <%= orderStats.pending_orders || 0 %>
+        </div>
+      </div>
+      
+      <div class="stat-card products">
+        <div class="stat-label">Products</div>
+        <div class="stat-value"><%= productStats.total_products || 0 %></div>
+        <div class="stat-change">Stock: <%= productStats.total_stock || 0 %> units</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-label">Average Order Value</div>
+        <div class="stat-value">$<%= (orderStats.avg_order_value || 0).toFixed(2) %></div>
+        <div class="stat-change">Per order</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <!-- Monthly Revenue Chart -->
+      <div class="chart-container">
+        <h3>📈 Monthly Revenue Trend</h3>
+        <canvas id="revenueChart"></canvas>
+      </div>
+
+      <!-- User & Product Stats -->
+      <div class="table-container">
+        <h3>📋 System Overview</h3>
+        <div class="metric">
+          <span class="metric-label">Total Users</span>
+          <span class="metric-value"><%= userStats.total_users || 0 %></span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Admin Accounts</span>
+          <span class="metric-value"><%= userStats.admin_count || 0 %></span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Manager Accounts</span>
+          <span class="metric-value"><%= userStats.manager_count || 0 %></span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Low Stock Items</span>
+          <span class="metric-value" style="color: #dc3545;"><%= productStats.low_stock_items || 0 %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Performance -->
+    <div class="table-container">
+      <h3>🏷️ Category Performance</h3>
+      <% if (categoryStats && categoryStats.length > 0) { %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Products</th>
+              <th>Units Sold</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% categoryStats.forEach(cat => { %>
+              <tr>
+                <td><strong><%= cat.name %></strong></td>
+                <td><%= cat.product_count %></td>
+                <td><%= cat.total_sold || 0 %> units</td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <p>No category data available yet.</p>
+      <% } %>
+    </div>
+
+    <!-- Top Products -->
+    <div class="table-container" style="margin-top: 20px;">
+      <h3>🔥 Top Selling Products</h3>
+      <% if (topProducts && topProducts.length > 0) { %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Times Sold</th>
+              <th>Units Sold</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% topProducts.forEach(product => { %>
+              <tr>
+                <td><strong><%= product.name %></strong></td>
+                <td><%= product.times_sold %></td>
+                <td><%= product.total_quantity %></td>
+                <td>$<%= (product.total_revenue || 0).toFixed(2) %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <p>No sales data available yet.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    // Monthly Revenue Chart
+    const monthlyData = <%- JSON.stringify(monthlyRevenue) %>;
+    
+    if (monthlyData && monthlyData.length > 0) {
+      const labels = monthlyData.reverse().map(d => d.month);
+      const revenues = monthlyData.map(d => parseFloat(d.revenue || 0));
+      const orders = monthlyData.map(d => d.orders);
+      
+      const ctx = document.getElementById('revenueChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Revenue ($)',
+            data: revenues,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 2,
+            yAxisID: 'y'
+          }, {
+            label: 'Orders',
+            data: orders,
+            type: 'line',
+            borderColor: 'rgba(255, 159, 64, 1)',
+            backgroundColor: 'rgba(255, 159, 64, 0.1)',
+            borderWidth: 2,
+            yAxisID: 'y1'
+          }]
+        },
+        options: {
+          responsive: true,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Revenue ($)'
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Orders'
+              },
+              grid: {
+                drawOnChartArea: false,
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,10 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+// Initialize Stripe only if key is provided
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_SECRET_KEY.includes('placeholder')) {
+  stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+}
 
 // Stripe webhook
 router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+  // If Stripe not configured, just acknowledge
+  if (!stripe) {
+    return res.json({ received: true, message: 'Stripe not configured' });
+  }
+
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

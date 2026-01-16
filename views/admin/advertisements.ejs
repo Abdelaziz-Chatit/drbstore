@@ -1,38 +1,45 @@
-<h1>Manage Advertisements</h1>
+<div class="page-header">
+    <h1>Manage Advertisements</h1>
+    <p>Create and manage homepage carousel advertisements</p>
+</div>
 
-<div style="margin-bottom: 2rem;">
-    <h2>Add New Advertisement</h2>
-    <form method="POST" action="/admin/advertisements" enctype="multipart/form-data" style="max-width: 600px;">
+<div class="card" style="margin-bottom: 3rem;">
+    <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Add New Advertisement</h2>
+    <form method="POST" action="/admin/advertisements" enctype="multipart/form-data">
         <div class="form-group">
-            <label>Title</label>
-            <input type="text" name="title" class="form-control" required>
+            <label>Title *</label>
+            <input type="text" name="title" class="form-control" required placeholder="Enter advertisement title">
         </div>
         <div class="form-group">
             <label>Description</label>
-            <textarea name="description" class="form-control" rows="3"></textarea>
+            <textarea name="description" class="form-control" rows="3" placeholder="Enter advertisement description (optional)"></textarea>
         </div>
         <div class="form-group">
-            <label>Link (optional)</label>
-            <input type="url" name="link" class="form-control">
+            <label>Link URL (optional)</label>
+            <input type="url" name="link" class="form-control" placeholder="https://example.com">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="form-group">
+                <label>Display Order</label>
+                <input type="number" name="order" class="form-control" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" name="is_active" checked style="width: auto;">
+                    <span>Active</span>
+                </label>
+            </div>
         </div>
         <div class="form-group">
-            <label>Image</label>
+            <label>Advertisement Image *</label>
             <input type="file" name="image" accept="image/*" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label>Order</label>
-            <input type="number" name="order" class="form-control" value="0">
-        </div>
-        <div class="form-group">
-            <label>
-                <input type="checkbox" name="is_active" checked> Active
-            </label>
+            <small style="color: var(--text-secondary); margin-top: 0.5rem; display: block;">Recommended: 1920x600px or similar wide format</small>
         </div>
         <button type="submit" class="btn btn-success">Create Advertisement</button>
     </form>
 </div>
 
-<h2>All Advertisements</h2>
+<h2 style="margin: 2.5rem 0 1rem 0; font-size: 1.75rem;">All Advertisements</h2>
 <div class="product-grid">
     <% if (typeof advertisements !== 'undefined' && advertisements.length > 0) { %>
         <% advertisements.forEach(ad => { %>
@@ -40,16 +47,125 @@
             <img src="<%= ad.image ? '/uploads/' + ad.image : '/images/placeholder.jpg' %>" alt="<%= ad.title %>">
             <div class="product-card-body">
                 <h3><%= ad.title %></h3>
-                <p><%= ad.description || '' %></p>
-                <p><strong>Order:</strong> <%= ad.order %></p>
-                <p><strong>Active:</strong> <%= ad.is_active ? 'Yes' : 'No' %></p>
+                <% if (ad.description) { %>
+                    <p><%= ad.description %></p>
+                <% } %>
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <p><strong>Order:</strong> <%= ad.order %></p>
+                    <p>
+                        <strong>Status:</strong> 
+                        <span class="status-badge status-<%= ad.is_active ? 'paid' : 'cancelled' %>">
+                            <%= ad.is_active ? 'Active' : 'Inactive' %>
+                        </span>
+                    </p>
+                    <div style="margin-top: 1rem; display: flex; gap: 10px;">
+                        <button class="btn btn-sm" style="background-color: #007bff; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; flex: 1;" onclick="editAdvertisement('<%= JSON.stringify(ad).replace(/'/g, '&#39;') %>')">Edit</button>
+                        <form method="POST" action="/admin/advertisements/<%= ad.id %>/delete" style="display: inline; flex: 1;" onsubmit="return confirm('Delete this advertisement?');">
+                            <button type="submit" class="btn btn-sm" style="background-color: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; width: 100%;">Delete</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
         <% }); %>
     <% } else { %>
-        <p>No advertisements yet</p>
+        <div class="empty-state">
+            <h3>No advertisements yet</h3>
+            <p>Create your first advertisement to display on the homepage</p>
+        </div>
     <% } %>
 </div>
 
-<a href="/admin" class="btn" style="margin-top: 2rem;">Back to Dashboard</a>
+<!-- Edit Advertisement Modal -->
+<div id="editAdModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background-color: white; padding: 30px; border-radius: 8px; max-width: 600px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;">
+        <h2 style="margin-top: 0;">Edit Advertisement</h2>
+        <form id="editAdForm" method="POST" enctype="multipart/form-data">
+            <input type="hidden" id="adId" name="id">
+            
+            <div class="form-group">
+                <label>Title *</label>
+                <input type="text" id="adTitle" name="title" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="adDescription" name="description" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Link URL (optional)</label>
+                <input type="url" id="adLink" name="link" class="form-control">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label>Display Order</label>
+                    <input type="number" id="adOrder" name="order" class="form-control" min="0">
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="adIsActive" name="is_active" style="width: auto;">
+                        <span>Active</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Advertisement Image</label>
+                <input type="file" id="adImage" name="image" accept="image/*" class="form-control">
+                <small style="color: var(--text-secondary); margin-top: 0.5rem; display: block;">Leave empty to keep current image</small>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="closeEditAdModal()" style="background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Update Advertisement</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="<% if (user.roles.includes('ROLE_ADMIN')) { %>/admin<% } else { %>/admin/manager-dashboard<% } %>" class="btn btn-outline">← Back to Dashboard</a>
+</div>
+
+<script>
+    function editAdvertisement(adData) {
+        try {
+            const ad = JSON.parse(adData);
+            console.log('Editing advertisement:', ad);
+            document.getElementById('adId').value = ad.id;
+            document.getElementById('adTitle').value = ad.title;
+            document.getElementById('adDescription').value = ad.description || '';
+            document.getElementById('adLink').value = ad.link || '';
+            document.getElementById('adOrder').value = ad.order || 0;
+            document.getElementById('adIsActive').checked = ad.is_active ? true : false;
+            document.getElementById('editAdForm').action = '/admin/advertisements/' + ad.id;
+            const modal = document.getElementById('editAdModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                console.log('Ad modal opened successfully');
+            } else {
+                console.error('Ad modal element not found');
+            }
+        } catch (error) {
+            console.error('Error in editAdvertisement:', error);
+        }
+    }
+
+    function closeEditAdModal() {
+        const modal = document.getElementById('editAdModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Close modal when clicking outside - wait for DOM ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('editAdModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeEditAdModal();
+                }
+            });
+        }
+    });
+</script>
 

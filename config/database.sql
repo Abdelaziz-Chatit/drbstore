@@ -86,6 +86,11 @@ CREATE TABLE IF NOT EXISTS advertisements (
 
 -- Insert default admin user (password: admin123)
 INSERT INTO users (name, email, password, roles) VALUES 
-('Admin', 'admin@drbstore.com', '$2a$10$rOzJqJqJqJqJqJqJqJqJqOqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJq', '["ROLE_ADMIN", "ROLE_USER"]')
+('Admin', 'admin@drbstore.com', '$2a$10$9HXOjL1eL6GQqvZIyGIt5e/mwFShqKfrdTFE3tmDYjdlNOeFc.kEO', '["ROLE_ADMIN", "ROLE_USER"]')
+ON DUPLICATE KEY UPDATE name=name;
+
+-- Insert default manager/responsable user (password: manager123)
+INSERT INTO users (name, email, password, roles) VALUES 
+('Manager', 'manager@drbstore.com', '$2a$10$Bo7b/eYSZp4mrWyDyJspPesYWPeqe6tBsrM2Wh2axEr2WTLCHi.He', '["ROLE_RESPONSABLE", "ROLE_USER"]')
 ON DUPLICATE KEY UPDATE name=name;
 

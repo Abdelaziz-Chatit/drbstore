@@ -1,0 +1,51 @@
+HOW TO PUSH CODE TO REPOSITORY
+
+1. CHECK STATUS OF YOUR CHANGES
+   Command: git status
+   This shows which files have been modified, added, or deleted
+
+2. ADD FILES TO STAGING AREA
+   Add all changes:
+   Command: git add .
+   
+   OR add specific files:
+   Command: git add <filename>
+   Example: git add routes/admin.js
+
+3. COMMIT YOUR CHANGES
+   Command: git commit -m "Your commit message"
+   Example: git commit -m "Fix back buttons for role-aware routing"
+   
+   Good commit message practices:
+   - Be clear and descriptive
+   - Explain WHAT changed and WHY
+   - Use present tense: "Fix" not "Fixed"
+   - Keep it concise (50 characters or less for first line)
+
+4. PUSH TO REMOTE REPOSITORY
+   Command: git push
+   
+   OR push to specific branch:
+   Command: git push origin <branch-name>
+   Example: git push origin main
+
+5. FULL WORKFLOW EXAMPLE
+   git status                          (check what changed)
+   git add .                          (stage all changes)
+   git commit -m "Fix admin routing"  (commit changes)
+   git push                           (push to repository)
+
+6. TROUBLESHOOTING
+   If push is rejected:
+   - Pull first: git pull origin main
+   - Then push: git push origin main
+   
+   View your branches:
+   - git branch (local branches)
+   - git branch -a (all branches including remote)
+
+7. USEFUL COMMANDS
+   View commit history: git log
+   View changes before committing: git diff
+   Undo last commit: git reset HEAD~1
+   Cancel changes in file: git checkout -- <filename>

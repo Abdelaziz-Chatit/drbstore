@@ -1,7 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+// Initialize Stripe only if key is provided
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_SECRET_KEY.includes('placeholder')) {
+  stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+} else {
+  console.warn('⚠️  Stripe keys not configured. Checkout will use demo mode.');
+}
+
 const { body, validationResult } = require('express-validator');
 
 // Middleware to check cart
@@ -99,6 +107,23 @@ router.post('/', checkCart, [
       );
     }
 
+    // If Stripe is not configured, redirect to demo success page
+    if (!stripe) {
+      // Mark order as paid (demo mode)
+      await db.execute('UPDATE orders SET status = ? WHERE id = ?', ['paid', orderId]);
+      
+      // Create a demo payment record
+      await db.execute(
+        'INSERT INTO payments (order_id, stripe_payment_id, amount, status) VALUES (?, ?, ?, ?)',
+        [orderId, 'demo_payment_' + orderId, total.toFixed(2), 'completed']
+      );
+      
+      // Clear cart
+      req.session.cart = {};
+      
+      return res.redirect(`/checkout/success?orderId=${orderId}&demo=true`);
+    }
+
     // Create Stripe checkout session
     const lineItems = cartItems.map(item => ({
       price_data: {
@@ -134,7 +159,7 @@ router.post('/', checkCart, [
 
 // Success page
 router.get('/success', async (req, res) => {
-  const { orderId } = req.query;
+  const { orderId, demo } = req.query;
   req.session.cart = {}; // Clear cart
 
   if (orderId) {
@@ -142,13 +167,14 @@ router.get('/success', async (req, res) => {
       const [orders] = await db.execute('SELECT * FROM orders WHERE id = ?', [orderId]);
       res.render('checkout/success', {
         title: 'Order Success - DRB Store',
-        order: orders[0] || null
+        order: orders[0] || null,
+        demoMode: demo === 'true'
       });
     } catch (error) {
-      res.render('checkout/success', { title: 'Order Success - DRB Store', order: null });
+      res.render('checkout/success', { title: 'Order Success - DRB Store', order: null, demoMode: demo === 'true' });
     }
   } else {
-    res.render('checkout/success', { title: 'Order Success - DRB Store', order: null });
+    res.render('checkout/success', { title: 'Order Success - DRB Store', order: null, demoMode: demo === 'true' });
   }
 });
 

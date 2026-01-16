@@ -1,10 +1,31 @@
-
-<div class="success-page">
-    <h1>Order Successful!</h1>
-    <p>Thank you for your purchase.</p>
-    <% if (typeof order !== 'undefined' && order) { %>
-        <p>Order ID: #<%= order.id %></p>
+<div class="empty-state" style="max-width: 600px; margin: 4rem auto;">
+    <div style="font-size: 5rem; margin-bottom: 1rem;">✅</div>
+    <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--success);">Order Successful!</h1>
+    <p style="font-size: 1.2rem; margin-bottom: 2rem; color: var(--text-secondary);">Thank you for your purchase. Your order has been confirmed.</p>
+    
+    <% if (typeof demoMode !== 'undefined' && demoMode) { %>
+        <div style="background: #fff3cd; border: 2px solid #ffc107; padding: 1rem; border-radius: var(--radius-lg); margin-bottom: 2rem; color: #856404;">
+            <strong>⚠️ Demo Mode</strong>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.95rem;">Stripe is not configured. This is a test order. To enable real payments, configure your Stripe API keys in the .env file.</p>
+        </div>
     <% } %>
-    <a href="/" class="btn">Continue Shopping</a>
+    
+    <% if (typeof order !== 'undefined' && order) { %>
+        <div style="background: var(--bg-primary); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem; box-shadow: var(--shadow-md);">
+            <p style="font-size: 1.1rem; margin-bottom: 0.5rem;"><strong>Order ID:</strong> <span style="color: var(--primary);">#<%= order.id %></span></p>
+            <p style="font-size: 1.1rem; margin-bottom: 0.5rem;"><strong>Total:</strong> <span style="color: var(--primary);">$<%= parseFloat(order.total_amount).toFixed(2) %></span></p>
+            <p style="font-size: 1.1rem; margin-bottom: 0.5rem;"><strong>Status:</strong> 
+                <span style="color: <% if(order.status === 'paid') { %>var(--success)<% } else if(order.status === 'pending') { %>var(--warning)<% } else { %>var(--danger)<% } %>;">
+                    <%= order.status.toUpperCase() %>
+                </span>
+            </p>
+            <p style="color: var(--text-secondary);">You will receive a confirmation email shortly.</p>
+        </div>
+    <% } %>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/" class="btn">Continue Shopping</a>
+        <a href="/products" class="btn btn-outline">Browse Products</a>
+    </div>
 </div>
 
